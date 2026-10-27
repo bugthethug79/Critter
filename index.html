@@ -4,10 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Critter</title>
-  <meta name="description" content="Critter Holdings builds and runs online businesses across any niche. When we make something, we make it well.">
+  <meta name="description" content="Critter Holdings builds, owns and operates online businesses. Each runs under its own name, backed by one team and one set of standards.">
   <meta name="theme-color" content="#0a0a0b">
   <meta property="og:title" content="Critter">
-  <meta property="og:description" content="When we make something, we make it well. Whatever it is.">
+  <meta property="og:description" content="We build, own and operate online businesses.">
   <meta property="og:type" content="website">
   <link rel="icon" type="image/svg+xml" href="assets/mark.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -36,86 +36,49 @@
       </a>
       <nav aria-label="Primary">
         <ul class="nav-links">
-          <li><a href="#what">What we do</a></li>
-          <li><a href="#how">How we work</a></li>
-          <li><a href="#companies">Companies</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#structure">Structure</a></li>
+          <li><a href="#standards">Standards</a></li>
         </ul>
       </nav>
-      <a class="nav-cta" href="#contact"><span class="dot" aria-hidden="true"></span>Contact</a>
+      <a class="nav-cta" href="#companies">Our companies</a>
     </div>
   </header>
 
   <main id="main">
-    <!-- Hero: a closed aluminum lid that opens as you scroll -->
-    <section class="hero" id="top" data-hero>
-      <div class="hero-stage">
-        <div class="grid-lines" aria-hidden="true">
-          <span class="gl gl-h"></span>
-        </div>
-
-        <div class="hero-copy" data-hero-copy>
-          <p class="eyebrow mono"><span class="tick" aria-hidden="true"></span>Critter Holdings</p>
-          <h1 class="hero-title" aria-label="Critter.">
-            <span class="ht-line" aria-hidden="true">
-              <span class="ht-ch" style="--i:0">C</span><span class="ht-ch" style="--i:1">r</span><span class="ht-ch" style="--i:2">i</span><span class="ht-ch" style="--i:3">t</span><span class="ht-ch" style="--i:4">t</span><span class="ht-ch" style="--i:5">e</span><span class="ht-ch" style="--i:6">r</span><span class="ht-ch ht-dot" style="--i:7">.</span>
-            </span>
-          </h1>
-          <p class="hero-lede">When we make something, we make it well. <span class="muted">Whatever it is.</span></p>
-          <div class="hero-actions">
-            <a class="btn btn-solid" href="#what" data-magnetic><span>See what we do</span></a>
-            <a class="btn btn-ghost" href="#contact" data-magnetic><span>Get in touch</span></a>
-          </div>
-        </div>
-
-        <p class="hero-caption" data-hero-caption>
-          <span class="cap-line">Mostly behind the scenes.</span>
-          <span class="cap-line muted">Never out of reach.</span>
-        </p>
-
-        <div class="lid-wrap" aria-hidden="true">
-          <div class="lid" data-lid>
-            <div class="lid-surface" data-lid-surface></div>
-            <div class="lid-sheen"></div>
-            <div class="lid-edge"></div>
-            <svg class="lid-mark"><use href="#mark"/></svg>
-            <div class="lid-annot">
-              <span class="corner c-tl"></span><span class="corner c-tr"></span>
-              <span class="corner c-bl"></span><span class="corner c-br"></span>
-              <span class="dim dim-x"><i></i><b class="mono">Fig. 01: Parent company</b><i></i></span>
-            </div>
-          </div>
-          <div class="lid-shadow"></div>
-        </div>
-
-        <div class="scroll-hint mono" data-scroll-hint aria-hidden="true">
-          <span>Scroll</span><span class="scroll-line"></span>
+    <!-- Hero: perforated-metal dot field behind the headline -->
+    <section class="hero" id="top">
+      <canvas class="hero-field" data-field aria-hidden="true"></canvas>
+      <div class="container hero-inner">
+        <p class="eyebrow mono"><span class="tick" aria-hidden="true"></span>Critter Holdings</p>
+        <h1 class="hero-title" aria-label="Critter.">
+          <span class="ht-line" aria-hidden="true">
+            <span class="ht-ch" style="--i:0">C</span><span class="ht-ch" style="--i:1">r</span><span class="ht-ch" style="--i:2">i</span><span class="ht-ch" style="--i:3">t</span><span class="ht-ch" style="--i:4">t</span><span class="ht-ch" style="--i:5">e</span><span class="ht-ch" style="--i:6">r</span><span class="ht-ch ht-dot" style="--i:7">.</span>
+          </span>
+        </h1>
+        <p class="hero-lede">We build, own and operate online businesses.</p>
+        <p class="hero-sub">Critter is the parent company behind a family of software products and online services. Each one runs under its own name, backed by one team and one set of standards.</p>
+        <div class="hero-actions">
+          <a class="btn btn-solid" href="#companies" data-magnetic><span>Our companies</span></a>
+          <a class="btn btn-ghost" href="#structure" data-magnetic><span>How it works</span></a>
         </div>
       </div>
     </section>
 
-    <!-- Marquee of niches; speed follows scroll velocity -->
-    <div class="marquee" aria-label="Areas we work in">
-      <div class="marquee-track" data-marquee>
-        <ul class="marquee-row">
-          <li>Game tools</li><li>Websites</li><li>Software</li><li>Marketplaces</li><li>Communities</li><li>Acquisitions</li>
-        </ul>
-      </div>
-    </div>
-
-    <!-- 01 What we do -->
-    <section class="section" id="what">
+    <!-- 01 About -->
+    <section class="section" id="about">
       <div class="container">
         <div class="section-head">
-          <p class="label mono" data-reveal><span class="idx">01</span>What we do</p>
-          <h2 class="h2" data-split>We build and run online brands.</h2>
-          <p class="intro" data-reveal>Critter is the parent company behind a growing set of online businesses. Each one has its own name, its own product and its own people. We give them the same standards and the same backing.</p>
+          <p class="label mono" data-reveal><span class="idx">01</span>About</p>
+          <h2 class="h2" data-split>Products built to be kept, not flipped.</h2>
+          <p class="intro" data-reveal>A lot of online products launch quickly and fade just as fast. Critter works the other way. We start or acquire businesses, give them the team and infrastructure they need, and keep running them for years.</p>
         </div>
 
         <ol class="pillars">
           <li class="pillar" data-reveal style="--d:0">
             <div class="pillar-top mono"><span>01</span><span class="pillar-rule"></span></div>
-            <h3>Build</h3>
-            <p>We start companies from a blank page: name, product, support, the lot. Every niche gets a proper effort, however small.</p>
+            <h3>Built in-house</h3>
+            <p>Product, design, engineering and support are handled by our own team, not handed off to whoever is cheapest.</p>
             <svg class="pillar-glyph" viewBox="0 0 120 64" aria-hidden="true">
               <rect class="g-draw" x="6" y="6" width="44" height="52" rx="2"/>
               <path class="g-draw" d="M60 58V30h26v28M96 58V14h18v44"/>
@@ -123,33 +86,84 @@
           </li>
           <li class="pillar" data-reveal style="--d:1">
             <div class="pillar-top mono"><span>02</span><span class="pillar-rule"></span></div>
-            <h3>Run</h3>
-            <p>We don't launch and leave. Updates ship, tickets get answered, and the same people are still there a year later.</p>
+            <h3>Independent brands</h3>
+            <p>Every company keeps its own name, product and community. Critter stays in the background and does the heavy lifting.</p>
             <svg class="pillar-glyph" viewBox="0 0 120 64" aria-hidden="true">
-              <path class="g-draw" d="M4 44h18l8-24 12 36 10-28 8 16h56"/>
+              <circle class="g-draw" cx="20" cy="32" r="14"/>
+              <circle class="g-draw" cx="60" cy="32" r="14"/>
+              <circle class="g-draw" cx="100" cy="32" r="14"/>
             </svg>
           </li>
           <li class="pillar" data-reveal style="--d:2">
             <div class="pillar-top mono"><span>03</span><span class="pillar-rule"></span></div>
-            <h3>Grow</h3>
-            <p>When a good business needs a steady home, we bring it in and look after it the same way we look after our own.</p>
+            <h3>Run for the long term</h3>
+            <p>We don't build to sell. Products keep getting updates, fixes and support long after launch day.</p>
             <svg class="pillar-glyph" viewBox="0 0 120 64" aria-hidden="true">
-              <circle class="g-draw" cx="32" cy="32" r="22"/>
-              <circle class="g-draw" cx="78" cy="32" r="22"/>
-              <path class="g-draw" d="M104 32h12"/>
+              <path class="g-draw" d="M4 54h22V42h22V30h22V18h22V6h24"/>
             </svg>
           </li>
         </ol>
       </div>
     </section>
 
-    <!-- 02 How we work: sticky index with an odometer counter -->
-    <section class="section how" id="how">
+    <!-- 02 Structure: animated org diagram -->
+    <section class="section" id="structure">
+      <div class="container">
+        <div class="section-head">
+          <p class="label mono" data-reveal><span class="idx">02</span>Structure</p>
+          <h2 class="h2" data-split>One company behind many.</h2>
+          <p class="intro" data-reveal>Critter provides the groundwork every business needs. That frees each company to focus on its product and the people who use it.</p>
+        </div>
+
+        <div class="tree" data-tree>
+          <div class="node node-root">
+            <svg class="node-mark" aria-hidden="true"><use href="#mark"/></svg>
+            <div>
+              <p class="node-title">Critter Holdings</p>
+              <p class="node-sub mono">Parent company</p>
+            </div>
+          </div>
+
+          <span class="wire wire-v" aria-hidden="true"></span>
+
+          <div class="shared">
+            <p class="shared-label mono">Shared across every company</p>
+            <ul class="shared-list">
+              <li>Engineering</li><li>Design</li><li>Payments</li><li>Customer support</li><li>Operations</li>
+            </ul>
+          </div>
+
+          <div class="branch" aria-hidden="true">
+            <span class="wire wire-v"></span>
+            <span class="wire wire-h"></span>
+            <span class="wire wire-v b1"></span><span class="wire wire-v b2"></span><span class="wire wire-v b3"></span>
+          </div>
+
+          <ul class="leaves">
+            <li class="node node-leaf">
+              <p class="node-title">Software</p>
+              <p class="node-sub">Tools and apps people use every day</p>
+            </li>
+            <li class="node node-leaf">
+              <p class="node-title">Gaming</p>
+              <p class="node-sub">Utilities and sites for player communities</p>
+            </li>
+            <li class="node node-leaf">
+              <p class="node-title">Online services</p>
+              <p class="node-sub">Stores, marketplaces and platforms</p>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 03 Standards: sticky index with an odometer counter -->
+    <section class="section how" id="standards">
       <div class="container how-grid">
         <div class="how-side">
           <div class="how-sticky">
-            <p class="label mono" data-reveal><span class="idx">02</span>How we work</p>
-            <h2 class="h2" data-split>Quiet, careful, and around for good.</h2>
+            <p class="label mono" data-reveal><span class="idx">03</span>Standards</p>
+            <h2 class="h2" data-split>What you get from a Critter company.</h2>
             <div class="odo" aria-hidden="true">
               <span class="odo-window"><span class="odo-col" data-odo><span>01</span><span>02</span><span>03</span><span>04</span></span></span>
               <span class="odo-total mono">/ 04</span>
@@ -161,67 +175,37 @@
         <ol class="principles">
           <li class="principle" data-principle>
             <span class="p-idx mono">01</span>
-            <h3>Made well, whatever it is.</h3>
-            <p>A small utility gets the same attention as a full platform. The size of the niche doesn't change the standard.</p>
+            <h3>Products that work.</h3>
+            <p>Everything is tested before it ships, and when something does break, fixing it comes first.</p>
           </li>
           <li class="principle" data-principle>
             <span class="p-idx mono">02</span>
-            <h3>We stay.</h3>
-            <p>No disappearing sellers, no abandoned products, no silent inboxes. If something breaks, we fix it and we tell you when.</p>
+            <h3>Support that answers.</h3>
+            <p>Every product has real people behind it. Questions get replies and problems get followed through.</p>
           </li>
           <li class="principle" data-principle>
             <span class="p-idx mono">03</span>
-            <h3>Community first.</h3>
-            <p>Every brand we run is built around the people who use it. They shape what comes next; we do the work.</p>
+            <h3>No surprises.</h3>
+            <p>Updates, changes and downtime are announced up front, so you're never left guessing.</p>
           </li>
           <li class="principle" data-principle>
             <span class="p-idx mono">04</span>
-            <h3>Organized, on purpose.</h3>
-            <p>We move at a deliberate pace. Fewer launches, each one finished properly, with support ready on day one.</p>
+            <h3>Shaped by its users.</h3>
+            <p>Each product grows with its community. What people ask for is what gets built next.</p>
           </li>
         </ol>
       </div>
     </section>
 
-    <!-- Lineage: the subtle nod -->
-    <section class="lineage">
-      <div class="container lineage-inner">
-        <svg class="lineage-mark" aria-hidden="true"><use href="#mark"/></svg>
-        <p class="lineage-text" data-split="scrub">A bug is a critter. We started with one small tool and a community that kept recommending it. That's still the model, just across more niches.</p>
-      </div>
-    </section>
-
-    <!-- 03 Companies: rendered from COMPANIES in assets/js/main.js -->
+    <!-- 04 Companies: rendered from COMPANIES in assets/js/main.js -->
     <section class="section" id="companies">
       <div class="container">
-        <div class="section-head section-head--row">
-          <div>
-            <p class="label mono" data-reveal><span class="idx">03</span>Our companies</p>
-            <h2 class="h2" data-split>Many names. One standard.</h2>
-          </div>
-          <p class="intro" data-reveal>Each company carries its own name and runs on its own. Look for the line <em>a Critter company</em>.</p>
+        <div class="section-head">
+          <p class="label mono" data-reveal><span class="idx">04</span>Companies</p>
+          <h2 class="h2" data-split>Our companies.</h2>
+          <p class="intro" data-reveal>Critter companies operate under their own names. You can spot one by the line <em>a Critter company</em> on its site.</p>
         </div>
         <div class="companies" data-companies></div>
-      </div>
-    </section>
-
-    <!-- 04 Contact -->
-    <section class="section contact" id="contact">
-      <div class="container">
-        <p class="label mono" data-reveal><span class="idx">04</span>Contact</p>
-        <h2 class="h2 h2-xl" data-split>Talk to a real person.</h2>
-        <div class="contact-grid">
-          <div class="contact-item" data-reveal style="--d:0">
-            <p class="mono contact-kicker">Partners, processors, acquisitions</p>
-            <a class="contact-link" href="mailto:hello@critter.holdings" data-email>hello@critter.holdings<span class="arrow" aria-hidden="true">↗</span></a>
-            <button class="copy mono" type="button" data-copy="hello@critter.holdings">Copy</button>
-          </div>
-          <div class="contact-item" data-reveal style="--d:1">
-            <p class="mono contact-kicker">Help with one of our products</p>
-            <a class="contact-link" href="mailto:support@critter.holdings" data-email>support@critter.holdings<span class="arrow" aria-hidden="true">↗</span></a>
-            <button class="copy mono" type="button" data-copy="support@critter.holdings">Copy</button>
-          </div>
-        </div>
       </div>
     </section>
   </main>
@@ -233,12 +217,10 @@
         <svg class="brand-mark" aria-hidden="true"><use href="#mark"/></svg>
         <span>Critter Holdings</span>
       </div>
-      <p class="mono footer-meta">© <span data-year>2026</span> Critter Holdings. All rights reserved.</p>
+      <p class="mono footer-meta">© <span data-year>2026</span> Critter Holdings</p>
       <a class="mono footer-top" href="#top">Back to top ↑</a>
     </div>
   </footer>
-
-  <div class="toast mono" role="status" aria-live="polite" data-toast></div>
 
   <script src="assets/js/main.js" defer></script>
 </body>

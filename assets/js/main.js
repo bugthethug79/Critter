@@ -4,13 +4,13 @@
    ========================================================================== */
 
 /*
- * Companies shown in section 03. Add one object per company; the grid
- * pads itself with "unannounced" slots up to MIN_COMPANY_SLOTS.
+ * Companies shown in section 04. Add one object per company:
  *
- *   { name: "Name", niche: "What it does", url: "https://…", live: true }
+ *   { name: "Name", description: "What it does", url: "https://…", live: true }
+ *
+ * While the list is empty, a short "launching soon" note is shown instead.
  */
 const COMPANIES = [];
-const MIN_COMPANY_SLOTS = 3;
 
 (() => {
   "use strict";
@@ -21,96 +21,137 @@ const MIN_COMPANY_SLOTS = 3;
 
   const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
   const lerp = (a, b, t) => a + (b - a) * t;
-  const easeInOut = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
   const $ = (s, el = document) => el.querySelector(s);
   const $$ = (s, el = document) => Array.from(el.querySelectorAll(s));
 
   /* ------------------------------------------------------------------------
-     Toast
+     Hero dot field: a sheet of perforated metal. Dots swell and part
+     around the cursor, and a slow light passes across the sheet.
      ------------------------------------------------------------------------ */
-  const toastEl = $("[data-toast]");
-  let toastTimer;
-  function toast(msg) {
-    toastEl.textContent = msg;
-    toastEl.classList.add("is-shown");
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => toastEl.classList.remove("is-shown"), 2200);
-  }
+  const field = (() => {
+    const canvas = $("[data-field]");
+    if (!canvas) return null;
+    const ctx = canvas.getContext("2d");
+    let W = 0, H = 0, dpr = 1, gap = 22, cols = 0, rows = 0;
+    let visible = true;
+    const start = performance.now();
+    const mouse = { x: -9999, y: -9999, tx: -9999, ty: -9999 };
+    const accent = [255, 106, 61];
 
-  /* ------------------------------------------------------------------------
-     Brushed aluminum texture, generated once
-     ------------------------------------------------------------------------ */
-  function brushedTexture() {
-    const W = 1024, H = 640;
-    // Narrow noise strip, stretched horizontally → long brushed streaks
-    const strip = document.createElement("canvas");
-    strip.width = 48;
-    strip.height = H;
-    const sctx = strip.getContext("2d");
-    const sdata = sctx.createImageData(strip.width, H);
-    for (let y = 0; y < H; y++) {
-      const row = Math.random() * 30;
-      for (let x = 0; x < strip.width; x++) {
-        const v = row + Math.random() * 18;
-        const i = (y * strip.width + x) * 4;
-        sdata.data[i] = sdata.data[i + 1] = sdata.data[i + 2] = 255;
-        sdata.data[i + 3] = v;
+    function resize() {
+      const r = canvas.getBoundingClientRect();
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      W = r.width;
+      H = r.height;
+      gap = W < 600 ? 18 : 22;
+      cols = Math.ceil(W / gap) + 1;
+      rows = Math.ceil(H / gap) + 1;
+      canvas.width = Math.round(W * dpr);
+      canvas.height = Math.round(H * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      if (reduceMotion) draw(performance.now() + 4000);
+    }
+
+    function draw(now) {
+      const t = (now - start) / 1000;
+      ctx.clearRect(0, 0, W, H);
+
+      mouse.x = lerp(mouse.x, mouse.tx, 0.12);
+      mouse.y = lerp(mouse.y, mouse.ty, 0.12);
+
+      // Sweep the sheet in from the right on load
+      const intro = reduceMotion ? 1 : clamp((t - 0.2) / 1.8);
+      const sweepX = W * (1 - intro * 1.4);
+      // A slow band of light drifting across the surface
+      const band = ((t * 0.06) % 1.6 - 0.3) * W;
+      const ox = (W % gap) / 2;
+      const oy = (H % gap) / 2;
+
+      for (let j = 0; j < rows; j++) {
+        const y0 = oy + j * gap;
+        for (let i = 0; i < cols; i++) {
+          const x0 = ox + i * gap;
+          if (x0 < sweepX) continue;
+
+          // Fade toward the headline (left) and bottom so text stays clear
+          let mask;
+          if (W < 700) {
+            // Narrow screens: keep the sheet in the open space above the headline
+            mask = clamp(1 - (y0 / H - 0.08) / 0.18) * clamp((x0 / W - 0.15) / 0.5);
+          } else {
+            const side = clamp((x0 / W - 0.42) / 0.4);
+            mask = side * side * clamp(1 - (y0 / H - 0.55) / 0.45);
+          }
+          if (mask < 0.02) continue;
+
+          const dx = x0 - mouse.x;
+          const dy = y0 - mouse.y;
+          const d2 = dx * dx + dy * dy;
+          const lift = Math.exp(-d2 / (2 * 110 * 110));
+          const d = Math.sqrt(d2) || 1;
+          const push = lift * 9;
+          const x = x0 + (dx / d) * push;
+          const y = y0 + (dy / d) * push;
+
+          const wave = 0.5 + 0.5 * Math.sin(x0 * 0.011 + y0 * 0.006 + t * 0.7);
+          const light = Math.exp(-Math.pow((x0 + y0 * 0.35 - band) / 160, 2));
+          const edge = clamp((x0 - sweepX) / 140);
+
+          const r = 0.75 + wave * 0.35 + lift * 1.5 + light * 0.3;
+          const a = (0.09 + wave * 0.08 + light * 0.18 + lift * 0.55) * mask * edge;
+          if (a < 0.01) continue;
+
+          const k = clamp(lift * 1.6 - 0.35);
+          const cr = Math.round(lerp(237, accent[0], k));
+          const cg = Math.round(lerp(237, accent[1], k));
+          const cb = Math.round(lerp(238, accent[2], k));
+          ctx.fillStyle = `rgba(${cr},${cg},${cb},${a.toFixed(3)})`;
+          ctx.beginPath();
+          ctx.arc(x, y, r, 0, Math.PI * 2);
+          ctx.fill();
+        }
       }
     }
-    sctx.putImageData(sdata, 0, 0);
 
-    const c = document.createElement("canvas");
-    c.width = W;
-    c.height = H;
-    const ctx = c.getContext("2d");
-    ctx.imageSmoothingEnabled = true;
-    ctx.globalAlpha = 0.5;
-    ctx.drawImage(strip, 0, 0, W, H);
-
-    // Fine grain on top
-    const img = ctx.getImageData(0, 0, W, H);
-    for (let i = 0; i < img.data.length; i += 4) {
-      const n = (Math.random() - 0.5) * 10;
-      img.data[i + 3] = clamp(img.data[i + 3] + n, 0, 255);
+    function loop(now) {
+      if (visible) draw(now);
+      requestAnimationFrame(loop);
     }
-    ctx.putImageData(img, 0, 0);
-    return c.toDataURL("image/png");
-  }
 
-  const lidSurface = $("[data-lid-surface]");
-  if (lidSurface) {
-    try {
-      lidSurface.style.setProperty("--brushed", `url(${brushedTexture()})`);
-      lidSurface.style.backgroundSize = "100% 100%, cover";
-    } catch (_) { /* flat fallback is fine */ }
-  }
+    if (finePointer && !reduceMotion) {
+      window.addEventListener("pointermove", (e) => {
+        const r = canvas.getBoundingClientRect();
+        mouse.tx = e.clientX - r.left;
+        mouse.ty = e.clientY - r.top;
+      }, { passive: true });
+      document.addEventListener("pointerleave", () => { mouse.tx = mouse.ty = -9999; });
+    }
+
+    resize();
+    if (!reduceMotion) {
+      new IntersectionObserver(([en]) => { visible = en.isIntersecting; }).observe(canvas);
+      requestAnimationFrame(loop);
+    }
+    return { resize };
+  })();
 
   /* ------------------------------------------------------------------------
-     Split text
+     Split headings into words for the reveal
      ------------------------------------------------------------------------ */
   $$("[data-split]").forEach((el) => {
     const text = el.textContent.trim().replace(/\s+/g, " ");
-    const scrub = el.dataset.split === "scrub";
     el.setAttribute("aria-label", text);
     el.textContent = "";
     text.split(" ").forEach((word, i, arr) => {
-      if (scrub) {
-        const s = document.createElement("span");
-        s.className = "ws";
-        s.setAttribute("aria-hidden", "true");
-        s.textContent = word;
-        el.appendChild(s);
-      } else {
-        const w = document.createElement("span");
-        w.className = "w";
-        w.setAttribute("aria-hidden", "true");
-        const wi = document.createElement("span");
-        wi.className = "wi";
-        wi.style.setProperty("--i", i);
-        wi.textContent = word;
-        w.appendChild(wi);
-        el.appendChild(w);
-      }
+      const w = document.createElement("span");
+      w.className = "w";
+      w.setAttribute("aria-hidden", "true");
+      const wi = document.createElement("span");
+      wi.className = "wi";
+      wi.style.setProperty("--i", i);
+      wi.textContent = word;
+      w.appendChild(wi);
+      el.appendChild(w);
       if (i < arr.length - 1) el.appendChild(document.createTextNode(" "));
     });
   });
@@ -123,78 +164,88 @@ const MIN_COMPANY_SLOTS = 3;
      ------------------------------------------------------------------------ */
   const companiesEl = $("[data-companies]");
   if (companiesEl) {
-    const slots = Math.max(MIN_COMPANY_SLOTS, COMPANIES.length);
-    const pad = (n) => String(n).padStart(2, "0");
-    for (let i = 0; i < slots; i++) {
-      const co = COMPANIES[i];
-      const card = document.createElement(co && co.url ? "a" : "div");
-      card.className = "co" + (co ? "" : " co--soon");
-      card.setAttribute("data-reveal", "");
-      card.style.setProperty("--d", i % 3);
-      card.style.setProperty("--n", i);
-      if (co && co.url) {
-        card.href = co.url;
-        card.target = "_blank";
-        card.rel = "noopener";
-      }
-      const top = document.createElement("div");
-      top.className = "co-top mono";
-      const num = document.createElement("span");
-      num.textContent = `C—${pad(i + 1)}`;
+    if (!COMPANIES.length) {
+      companiesEl.className = "companies-empty";
+      companiesEl.setAttribute("data-reveal", "");
+      const p = document.createElement("p");
+      p.innerHTML = "<strong>Our first companies are getting ready to launch.</strong> They'll be listed here as they go live.";
       const status = document.createElement("span");
-      status.className = "co-status";
-      if (co && co.live) status.setAttribute("data-live", "");
-      status.textContent = co ? (co.live ? "Live" : "In development") : "Unannounced";
-      top.append(num, status);
+      status.className = "co-status mono";
+      status.setAttribute("data-live", "");
+      status.textContent = "In progress";
+      companiesEl.append(p, status);
+    } else {
+      COMPANIES.forEach((co, i) => {
+        const card = document.createElement(co.url ? "a" : "div");
+        card.className = "co";
+        card.setAttribute("data-reveal", "");
+        card.style.setProperty("--d", i % 3);
+        if (co.url) {
+          card.href = co.url;
+          card.target = "_blank";
+          card.rel = "noopener";
+        }
+        const top = document.createElement("div");
+        top.className = "co-top mono";
+        const status = document.createElement("span");
+        status.className = "co-status";
+        if (co.live) status.setAttribute("data-live", "");
+        status.textContent = co.live ? "Live" : "Coming soon";
+        top.append(status);
 
-      const body = document.createElement("div");
-      body.className = "co-body";
-      const name = document.createElement("p");
-      name.className = "co-name";
-      const niche = document.createElement("p");
-      niche.className = "co-niche";
-      if (co) {
+        const body = document.createElement("div");
+        body.className = "co-body";
+        const name = document.createElement("p");
+        name.className = "co-name";
         name.textContent = co.name;
-        niche.textContent = co.niche || "";
-      } else {
-        name.setAttribute("aria-label", "Unannounced company");
-        niche.textContent = "Coming soon";
-      }
-      const endorse = document.createElement("p");
-      endorse.className = "co-endorse mono";
-      const line = document.createElement("span");
-      line.textContent = "a Critter company";
-      const arrow = document.createElement("span");
-      arrow.className = "co-arrow";
-      arrow.setAttribute("aria-hidden", "true");
-      arrow.textContent = co && co.url ? "↗" : "·";
-      endorse.append(line, arrow);
-      body.append(name, niche, endorse);
-      card.append(top, body);
-      companiesEl.appendChild(card);
-    }
+        const desc = document.createElement("p");
+        desc.className = "co-niche";
+        desc.textContent = co.description || "";
+        const endorse = document.createElement("p");
+        endorse.className = "co-endorse mono";
+        const line = document.createElement("span");
+        line.textContent = "a Critter company";
+        endorse.append(line);
+        if (co.url) {
+          const arrow = document.createElement("span");
+          arrow.className = "co-arrow";
+          arrow.setAttribute("aria-hidden", "true");
+          arrow.textContent = "↗";
+          endorse.append(arrow);
+        }
+        body.append(name, desc, endorse);
+        card.append(top, body);
+        companiesEl.appendChild(card);
+      });
 
-    companiesEl.addEventListener("pointermove", (e) => {
-      const card = e.target.closest(".co");
-      if (!card) return;
-      const r = card.getBoundingClientRect();
-      card.style.setProperty("--x", `${e.clientX - r.left}px`);
-      card.style.setProperty("--y", `${e.clientY - r.top}px`);
-    });
+      companiesEl.addEventListener("pointermove", (e) => {
+        const card = e.target.closest(".co");
+        if (!card) return;
+        const r = card.getBoundingClientRect();
+        card.style.setProperty("--x", `${e.clientX - r.left}px`);
+        card.style.setProperty("--y", `${e.clientY - r.top}px`);
+      });
+    }
   }
 
   /* ------------------------------------------------------------------------
      Reveal on view
      ------------------------------------------------------------------------ */
-  const revealEls = $$("[data-reveal], [data-split]:not([data-split='scrub'])");
+  const tree = $("[data-tree]");
+  const revealEls = $$("[data-reveal], [data-split], [data-tree]");
+  const onReveal = (el) => {
+    el.classList.add("is-in");
+    // Once the diagram has built itself, start the flow along the wires
+    if (el === tree) setTimeout(() => tree.classList.add("is-flowing"), reduceMotion ? 0 : 2400);
+  };
   if (reduceMotion || !("IntersectionObserver" in window)) {
-    revealEls.forEach((el) => el.classList.add("is-in"));
+    revealEls.forEach(onReveal);
   } else {
     const io = new IntersectionObserver(
       (entries) => {
         entries.forEach((en) => {
           if (en.isIntersecting) {
-            en.target.classList.add("is-in");
+            onReveal(en.target);
             io.unobserve(en.target);
           }
         });
@@ -204,22 +255,6 @@ const MIN_COMPANY_SLOTS = 3;
     revealEls.forEach((el) => io.observe(el));
   }
 
-  /* ------------------------------------------------------------------------
-     Copy buttons, year
-     ------------------------------------------------------------------------ */
-  $$("[data-copy]").forEach((btn) => {
-    btn.addEventListener("click", async () => {
-      const value = btn.dataset.copy;
-      try {
-        await navigator.clipboard.writeText(value);
-        btn.textContent = "Copied";
-        toast(`Copied ${value}`);
-      } catch (_) {
-        toast(value);
-      }
-      setTimeout(() => (btn.textContent = "Copy"), 1800);
-    });
-  });
   const yearEl = $("[data-year]");
   if (yearEl) yearEl.textContent = new Date().getFullYear();
 
@@ -243,58 +278,16 @@ const MIN_COMPANY_SLOTS = 3;
   }
 
   /* ------------------------------------------------------------------------
-     Scroll-driven state: hero lid, nav, principles, lineage, marquee
+     Scroll-driven state: nav, standards list
      ------------------------------------------------------------------------ */
-  const hero = $("[data-hero]");
   const nav = $("[data-nav]");
   const navLinks = $$(".nav-links a");
   const principles = $$("[data-principle]");
   const odo = $("[data-odo]");
   const howProgress = $("[data-how-progress]");
   const howList = $(".principles");
-  const scrubEls = $$("[data-split='scrub']");
-  const marquee = $("[data-marquee]");
-
-  const pointer = { x: 0.5, y: 0.5 };
-  const state = {
-    o: 0, copy: 0, cap: 0, tx: 0, ty: 0, sx: -30,
-    lastY: window.scrollY, vel: 0, marqueeX: 0, activeIdx: -1,
-  };
-  const t0 = performance.now();
-
-  window.addEventListener("pointermove", (e) => {
-    pointer.x = e.clientX / window.innerWidth;
-    pointer.y = e.clientY / window.innerHeight;
-  }, { passive: true });
-
-  // Marquee: clone the row until there's enough to loop seamlessly
-  let rowWidth = 0;
-  function buildMarquee() {
-    if (!marquee) return;
-    const first = marquee.firstElementChild;
-    $$(".marquee-row", marquee).slice(1).forEach((r) => r.remove());
-    rowWidth = first.getBoundingClientRect().width;
-    const copies = Math.ceil((window.innerWidth * 2) / Math.max(rowWidth, 1)) + 1;
-    for (let i = 0; i < copies; i++) {
-      const clone = first.cloneNode(true);
-      clone.setAttribute("aria-hidden", "true");
-      marquee.appendChild(clone);
-    }
-  }
-  buildMarquee();
-
-  function heroTargets() {
-    if (!hero) return { o: 1, copy: 0, cap: 1 };
-    if (reduceMotion) return { o: 1, copy: 0, cap: 1 };
-    const r = hero.getBoundingClientRect();
-    const total = Math.max(1, hero.offsetHeight - window.innerHeight);
-    const p = clamp(-r.top / total);
-    return {
-      o: easeInOut(clamp((p - 0.04) / 0.66)),
-      copy: clamp((p - 0.02) / 0.4),
-      cap: clamp((p - 0.55) / 0.3),
-    };
-  }
+  let lastY = window.scrollY;
+  let activeIdx = -1;
 
   function updateNav(y, dy) {
     nav.classList.toggle("is-scrolled", y > 12);
@@ -320,88 +313,26 @@ const MIN_COMPANY_SLOTS = 3;
       const d = Math.abs(r.top + r.height / 2 - mid);
       if (d < bestD) { bestD = d; best = i; }
     });
-    if (best !== state.activeIdx) {
-      state.activeIdx = best;
+    if (best !== activeIdx) {
+      activeIdx = best;
       principles.forEach((el, i) => el.classList.toggle("is-active", i === best));
       if (odo) odo.style.setProperty("--i", best);
     }
     if (howProgress && howList) {
       const r = howList.getBoundingClientRect();
-      const p = clamp((mid - r.top) / r.height);
-      howProgress.parentElement.style.setProperty("--hp", p.toFixed(4));
+      howProgress.parentElement.style.setProperty("--hp", clamp((mid - r.top) / r.height).toFixed(4));
     }
   }
 
-  function updateScrub() {
-    scrubEls.forEach((el) => {
-      const r = el.getBoundingClientRect();
-      const vh = window.innerHeight;
-      const p = clamp((vh * 0.85 - r.top) / (r.height + vh * 0.35));
-      const words = el.children;
-      const n = words.length;
-      for (let i = 0; i < n; i++) {
-        const f = reduceMotion ? 1 : clamp(p * (n + 3) - i);
-        words[i].style.setProperty("--f", f.toFixed(3));
-      }
-    });
-  }
-
-  function frame(now) {
+  function onScroll() {
     const y = window.scrollY;
-    const dy = y - state.lastY;
-    state.lastY = y;
-    state.vel = lerp(state.vel, dy, 0.12);
-
-    // Hero lid
-    if (hero) {
-      const t = heroTargets();
-      const k = reduceMotion ? 1 : 0.09;
-      state.o = lerp(state.o, t.o, k);
-      state.copy = lerp(state.copy, t.copy, k * 1.4);
-      state.cap = lerp(state.cap, t.cap, k);
-
-      const intro = clamp((now - t0 - 600) / 2400);
-      const introSx = lerp(-40, 30, easeInOut(intro));
-      const px = finePointer ? pointer.x - 0.5 : 0;
-      const py = finePointer ? pointer.y - 0.5 : 0;
-      const tiltK = reduceMotion ? 0 : state.o;
-      state.tx = lerp(state.tx, py * 5 * tiltK, 0.08);
-      state.ty = lerp(state.ty, px * -7 * tiltK, 0.08);
-      state.sx = lerp(state.sx, introSx + state.o * 22 + px * 60, 0.08);
-
-      const s = hero.style;
-      s.setProperty("--o", state.o.toFixed(4));
-      s.setProperty("--copy", state.copy.toFixed(4));
-      s.setProperty("--cap", state.cap.toFixed(4));
-      s.setProperty("--tx", state.tx.toFixed(3));
-      s.setProperty("--ty", state.ty.toFixed(3));
-      s.setProperty("--sx", state.sx.toFixed(2));
-      hero.toggleAttribute("data-copy-hidden", state.copy > 0.5);
-    }
-
+    const dy = y - lastY;
+    lastY = y;
     if (nav) updateNav(y, dy);
     updatePrinciples();
-    updateScrub();
-
-    // Marquee: slow drift, nudged by scroll velocity
-    if (marquee && rowWidth && !reduceMotion) {
-      const speed = 0.45 + Math.min(Math.abs(state.vel) * 0.35, 14);
-      state.marqueeX -= speed;
-      if (-state.marqueeX >= rowWidth) state.marqueeX += rowWidth;
-      marquee.style.transform = `translate3d(${state.marqueeX.toFixed(2)}px,0,0)`;
-    }
-
-    requestAnimationFrame(frame);
   }
-
-  let resizeTimer;
-  window.addEventListener("resize", () => {
-    clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(() => {
-      buildMarquee();
-      critter && critter.resize();
-    }, 150);
-  });
+  window.addEventListener("scroll", onScroll, { passive: true });
+  onScroll();
 
   /* ------------------------------------------------------------------------
      The critter: a small bug that lives in the footer.
@@ -462,8 +393,8 @@ const MIN_COMPANY_SLOTS = 3;
         bug.pause = Math.random() < 0.6 ? 0.6 + Math.random() * 2.4 : 0;
         pickTarget();
       } else {
-        let want = Math.atan2(dy, dx);
-        let diff = ((want - bug.a + Math.PI * 3) % (Math.PI * 2)) - Math.PI;
+        const want = Math.atan2(dy, dx);
+        const diff = ((want - bug.a + Math.PI * 3) % (Math.PI * 2)) - Math.PI;
         const turn = (bug.flee ? 7 : 3.2) * dt;
         bug.a += clamp(diff, -turn, turn);
         const top = bug.flee ? 170 : 46;
@@ -516,7 +447,7 @@ const MIN_COMPANY_SLOTS = 3;
       for (let i = 0; i < 3; i++) {
         const sA = Math.sin(bug.phase + (i % 2 ? Math.PI : 0)) * amp;
         leg(-1, i, sA);
-        leg(1, i, -Math.sin(bug.phase + (i % 2 ? 0 : Math.PI)) * amp);
+        leg(1, i, -sA);
       }
 
       // Antennae
@@ -528,7 +459,7 @@ const MIN_COMPANY_SLOTS = 3;
       ctx.quadraticCurveTo(9 * S, 2.6 * S, 11 * S, (4.4 - tw * 6) * S);
       ctx.stroke();
 
-      // Abdomen + thorax + head
+      // Abdomen, wing seam, head
       ctx.fillStyle = "#1f2023";
       ctx.strokeStyle = "#7d7e84";
       ctx.lineWidth = 1;
@@ -562,14 +493,11 @@ const MIN_COMPANY_SLOTS = 3;
 
     function hit(e) {
       const r = canvas.getBoundingClientRect();
-      const x = e.clientX - r.left;
-      const y = e.clientY - r.top;
-      return Math.hypot(x - bug.x, y - bug.y) < 26;
+      return Math.hypot(e.clientX - r.left - bug.x, e.clientY - r.top - bug.y) < 26;
     }
 
     canvas.addEventListener("click", (e) => {
       if (!hit(e)) return;
-      toast("a bug is a critter.");
       bug.spin = 0.45;
       bug.pause = 0;
       bug.flee = 1;
@@ -579,7 +507,6 @@ const MIN_COMPANY_SLOTS = 3;
     const footer = $("[data-footer]");
     footer.addEventListener("pointermove", (e) => {
       const r = canvas.getBoundingClientRect();
-      // Let the bug notice the cursor a beat late, so it can be caught
       mouse.x = e.clientX - r.left;
       mouse.y = e.clientY - r.top;
       canvas.style.cursor = hit(e) ? "pointer" : "";
@@ -598,19 +525,14 @@ const MIN_COMPANY_SLOTS = 3;
     return { resize };
   })();
 
-  /* ------------------------------------------------------------------------
-     Start
-     ------------------------------------------------------------------------ */
-  requestAnimationFrame(() => {
-    root.classList.add("is-loaded");
-    requestAnimationFrame(frame);
+  let resizeTimer;
+  window.addEventListener("resize", () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      field && field.resize();
+      critter && critter.resize();
+    }, 150);
   });
 
-  if (window.console) {
-    console.log(
-      "%cCritter%c\nWhen we make something, we make it well.\nhello@critter.holdings",
-      "font: 600 20px Geist, system-ui; letter-spacing: -0.04em;",
-      "font: 12px 'Geist Mono', monospace; color: #8b8c92;"
-    );
-  }
+  requestAnimationFrame(() => root.classList.add("is-loaded"));
 })();

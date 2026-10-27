@@ -16,19 +16,15 @@ Create a Pages project from this repo with **no build command** and the output d
 ## Editing
 
 - **Companies:** add entries to `COMPANIES` at the top of `assets/js/main.js`:
-  `{ name, niche, url, live }`. Empty slots fill up to `MIN_COMPANY_SLOTS` as "Unannounced".
-- **Emails / domain:** the page uses `hello@critter.holdings` and `support@critter.holdings`.
-  Search for `critter.holdings` to change them once the domain is final.
+  `{ name, description, url, live }`. While the list is empty, the section shows a short "launching soon" note.
 - **Accent color:** `--accent` in `assets/css/style.css`.
 
 ## What moves
 
-- **Hero:** a brushed-aluminum lid, generated on a canvas, opens as you scroll. It tilts and catches light as the cursor moves.
+- **Hero:** a perforated-metal dot field. The dots part and warm up around the cursor, and a slow band of light drifts across them.
 - **Headline:** the letters reveal on load. Section headings reveal word by word.
-- **Marquee:** speeds up with scroll velocity.
-- **How we work:** a sticky odometer counter tracks the active principle.
-- **Lineage line:** fills in word by word as you scroll.
-- **Company cards:** a spotlight and border glow follow the cursor.
-- **Footer:** a small bug wanders around, avoids the cursor and can be clicked.
+- **Structure:** the company diagram builds itself, then pulses flow from the parent company down to each business.
+- **Standards:** a sticky counter rolls to whichever item is in view.
+- **Footer:** a small bug wanders around and keeps away from the cursor.
 
 All motion is disabled under `prefers-reduced-motion`.
