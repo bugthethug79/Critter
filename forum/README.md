@@ -27,4 +27,4 @@ Set `NODEBB_REF` to a newer release tag, such as `v4.17.0`, and restart. The lau
 
 ## Email
 
-NodeBB sends sign-up confirmations and password resets by email. Until there's an email service, go to **Admin → Settings → Email** and turn off the requirement for new users to confirm their address. When you have a sending service, enter its SMTP details on the same page.
+NodeBB sends sign-up confirmations and password resets by email. Until there's an email service, turn off the requirement for new users to confirm their email address in NodeBB's admin settings (under Email and User). When you have a sending service, enter its SMTP details on the Email settings page.
