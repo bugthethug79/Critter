@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Forums | Critter</title>
+  <meta name="description" content="The Critter forums: ask questions, report problems and share ideas about any Critter product.">
+  <meta name="theme-color" content="#0b0c0a">
+  <meta property="og:title" content="Critter Forums">
+  <meta property="og:description" content="Ask questions, report problems and share ideas about any Critter product.">
+  <meta property="og:type" content="website">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400..800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <script>
+    document.documentElement.classList.add('js');
+    // Arriving from another page: start covered by the curtain so it can lift on load.
+    try { if (sessionStorage.getItem('critter:to') && !matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentElement.classList.add('arriving'); } catch (e) {}
+  </script>
+</head>
+<body>
+  <!-- Page-wide background: slow drifting gradient with grain -->
+  <canvas class="field" data-field aria-hidden="true"></canvas>
+
+  <a class="skip" href="#main">Skip to content</a>
+
+  <div class="curtain" data-curtain aria-hidden="true">
+    <span class="curtain-col" style="--i:0"></span><span class="curtain-col" style="--i:1"></span><span class="curtain-col" style="--i:2"></span><span class="curtain-col" style="--i:3"></span><span class="curtain-col" style="--i:4"></span>
+    <span class="curtain-title" data-curtain-title>Forums</span>
+  </div>
+  <script>try { var t = sessionStorage.getItem('critter:to'); if (t) document.querySelector('[data-curtain-title]').textContent = t; } catch (e) {}</script>
+
+  <header class="nav" data-nav>
+    <div class="container nav-inner">
+      <a class="brand" href="index.html" data-title="Critter" aria-label="Critter, home">Critter</a>
+      <nav aria-label="Primary">
+        <ul class="nav-links" data-nav-links>
+          <li><a href="index.html#about" data-title="About">About</a></li>
+          <li><a href="index.html#standards" data-title="Standards">Standards</a></li>
+          <li><a href="index.html#companies" data-title="Companies">Companies</a></li>
+          <li><a href="forums.html" class="is-active" aria-current="page">Forums</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero hero-page" id="top" data-hero data-title="Forums">
+      <div class="container hero-inner" data-hero-content>
+        <h1 class="hero-title" data-hero-title>
+          <span class="line"><span class="line-in">Forums</span></span>
+        </h1>
+        <div class="hero-aside" data-intro>
+          <p>Ask questions, report problems and share ideas about any Critter product. The people who build the products read and reply here.</p>
+          <a class="btn" data-forum-link>Open the forums</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="uses" data-title="Forums">
+      <div class="container chapter">
+        <header class="chapter-head">
+          <p class="eyebrow" data-reveal>What it's for</p>
+          <h2 class="h2" data-split>One place to talk to us</h2>
+        </header>
+        <div class="chapter-body">
+          <ul class="grid grid-3">
+            <li class="item" data-reveal style="--d:0">
+              <h3>Get help</h3>
+              <p>Post a question or a bug report and get an answer from the team or from other users.</p>
+            </li>
+            <li class="item" data-reveal style="--d:1">
+              <h3>Shape what's next</h3>
+              <p>Suggest features and vote on ideas. What people ask for is what gets built.</p>
+            </li>
+            <li class="item" data-reveal style="--d:2">
+              <h3>Hear it first</h3>
+              <p>Updates, changes and planned downtime are posted here before they happen.</p>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <span>© <span data-year>2026</span> Critter Holdings</span>
+    </div>
+  </footer>
+
+  <script src="assets/js/main.js" defer></script>
+  <script src="assets/js/field.js" defer></script>
+</body>
+</html>
