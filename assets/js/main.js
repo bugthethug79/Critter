@@ -15,7 +15,7 @@
 
   // Address of the forums (hosted on bot-hosting.net). While empty, the forums page button
   // reads "Opening soon" instead of linking anywhere.
-  const FORUM_URL = '';
+  const FORUM_URL = 'https://critter-forum.apps.bot-hosting.cloud';
 
   const root = document.documentElement;
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
