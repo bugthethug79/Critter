@@ -1,0 +1,12 @@
+{
+  "name": "critter-forum",
+  "private": true,
+  "description": "Launcher that installs and runs NodeBB for the Critter forums",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
