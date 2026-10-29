@@ -98,7 +98,13 @@ const runtimeEnv = {
 	port,
 	trust_proxy: 'true', // the panel's HTTPS proxy sits in front of the app
 	NODE_ENV: 'production',
+	// The container allows only a few processes; see limit-cpus.js
+	NODE_OPTIONS: `${process.env.NODE_OPTIONS || ''} --require ${path.join(__dirname, 'limit-cpus.js')}`.trim(),
+	GOMAXPROCS: process.env.GOMAXPROCS || '1', // esbuild, used by the minifier
+	series: 'true', // build one target at a time
 };
+// Lets the database password be changed later by updating MONGO_URI alone
+if (process.env.MONGO_URI) runtimeEnv.mongo__uri = process.env.MONGO_URI;
 
 if (!fs.existsSync(configFile)) {
 	log('No config.json yet: running first-time setup');
@@ -122,11 +128,18 @@ if (!fs.existsSync(configFile)) {
 		setup['mongo:database'] = process.env.MONGO_DATABASE || 'nodebb';
 	}
 
-	run('node', ['app.js', `--setup=${JSON.stringify(setup)}`], { cwd: dir, env: runtimeEnv });
+	// Passed in the environment, not as an argument: arguments end up in logs and error reports
+	run('node', ['app.js'], { cwd: dir, env: { ...runtimeEnv, setup: JSON.stringify(setup) } });
 	if (!fs.existsSync(configFile)) fail('Setup finished without writing config.json. Check the log above.');
 	log('Setup complete. You can now remove ADMIN_PASSWORD from the environment variables.');
 } else if (upgraded) {
 	run('node', ['nodebb', 'upgrade'], { cwd: dir, env: runtimeEnv });
+}
+
+// The front-end build writes this last, so it's missing if a build was interrupted
+if (!fs.existsSync(path.join(dir, 'build', 'cache-buster'))) {
+	log('Front end not built yet: building it now');
+	run('node', ['nodebb', 'build'], { cwd: dir, env: runtimeEnv });
 }
 
 /* 4. Run ------------------------------------------------------------------ */

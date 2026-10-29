@@ -18,7 +18,9 @@ Runs [NodeBB](https://nodebb.org) on bot-hosting.net using a Node.js application
    | `MONGO_HOST`, `MONGO_PORT`, `MONGO_USERNAME`, `MONGO_PASSWORD`, `MONGO_DATABASE` | The MongoDB details, if the panel gives them separately |
 
    The port is taken from `SERVER_PORT` or `PORT` (whichever the panel sets), falling back to `4567`.
-4. **Start the app.** The first start takes several minutes: it downloads NodeBB, installs packages and builds the front end. That build needs about **1 GB of RAM**. When the log says `Setup complete`, delete `ADMIN_PASSWORD` from the variables.
+4. **Start the app.** The first start takes several minutes: it downloads NodeBB, installs packages and builds the front end. That build needs about **1 GB of RAM**. When the log says `Setup complete`, delete `ADMIN_PASSWORD` from the variables. Keep `MONGO_URI`: it's applied on every start, so changing the database password only means updating it.
+
+   The container allows only a few processes, so the build runs with one worker (`limit-cpus.js`). If the host allows more, set `FORUM_CPUS` (e.g. `2`) for a faster build. If a build is interrupted, the next start finishes it.
 5. **Domain.** Attach your forum domain to the application, then set `FORUM_URL` in `assets/js/main.js` on the main site so the Forums page links to it.
 
 ## Updating NodeBB
