@@ -96,7 +96,6 @@ const runtimeEnv = {
 	...process.env,
 	url,
 	port,
-	trust_proxy: 'true', // the panel's HTTPS proxy sits in front of the app
 	NODE_ENV: 'production',
 	// The container allows only a few processes; see limit-cpus.js
 	NODE_OPTIONS: `${process.env.NODE_OPTIONS || ''} --require ${path.join(__dirname, 'limit-cpus.js')}`.trim(),
@@ -134,6 +133,14 @@ if (!fs.existsSync(configFile)) {
 	log('Setup complete. You can now remove ADMIN_PASSWORD from the environment variables.');
 } else if (upgraded) {
 	run('node', ['nodebb', 'upgrade'], { cwd: dir, env: runtimeEnv });
+}
+
+// The panel's HTTPS proxy sits in front of the app. This has to be a real boolean,
+// so it goes in config.json: values from the environment arrive as strings.
+const config = JSON.parse(fs.readFileSync(configFile, 'utf8'));
+if (config.trust_proxy !== true) {
+	config.trust_proxy = true;
+	fs.writeFileSync(configFile, `${JSON.stringify(config, null, 4)}\n`);
 }
 
 // The front-end build writes this last, so it's missing if a build was interrupted
